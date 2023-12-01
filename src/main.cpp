@@ -4,7 +4,7 @@
 
 void setup() {
   Serial.begin(9600);
-  rf_recieve_init();
+  rf_receive_init();
 }
 
 void loop() {
