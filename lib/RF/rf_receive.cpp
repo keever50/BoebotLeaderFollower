@@ -5,7 +5,7 @@ volatile bool rf_data_incoming=0;
 volatile bool rf_data_ready = 0;
 volatile int rf_signal_buffer[RF_R_DATA_BUFFER_SIZE]={0};
 
-//dsfdsfjds
+
 /*
 Returns the data received using the parameter int pos.
 The amount of bytes to be received is max RF_R_DATA_BUFFER_SIZE.
