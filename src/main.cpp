@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <rf_receive.h>
 
-
 void setup() {
   Serial.begin(9600);
   rf_receive_init();
