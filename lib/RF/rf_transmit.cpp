@@ -1,4 +1,5 @@
-#define transmissietijd_ms 1000
+#include <Arduino.h>
+#include <rf_transmit.h>
 
 void transmit(char pin, double freq, char duty_cycle)
 {
