@@ -4,8 +4,11 @@
 
 //Definitions
 #define transmissietijd_ms 1000
+#define freq 1000
+#define trans_pin 3
 
-void transmit(char pin, double freq, char duty_cycle);
+void transmit_single(char high_low);
+void transmit_binary(char *array, int size);
 
 
 #endif
