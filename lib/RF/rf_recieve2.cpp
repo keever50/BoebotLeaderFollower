@@ -37,13 +37,13 @@ void rf_debug(float *freq, float *duty, int *detect)
 
 void rf_receive_ISR()
 {
-    static unsigned long start_time=0;
-    static unsigned long end_time=0;
-    static unsigned long wave_period;
-    static unsigned long wave_frequency;
-    static int bit_count=0;
+    volatile static unsigned long start_time=0;
+    volatile static unsigned long end_time=0;
+    volatile static unsigned long wave_period;
+    volatile static unsigned long wave_frequency;
+    volatile static int bit_count=0;
 
-    int state = digitalRead(RF_RECEIVE_PIN);
+    volatile int state = digitalRead(RF_RECEIVE_PIN);
     if(state==0)
     {
         //Calculate frequency
@@ -79,18 +79,15 @@ void rf_receive_ISR()
 
             }else{
                 digitalWrite(LED_BUILTIN, LOW);
-                if(bit_count>0)
+                if(bit_count>=8)
                 {
                     rf_receive_data_ready=1;
-                    bit_count=0;
+                    
                 }
-                
+                bit_count=0;
                 
             }
         }
-
-
-
 
     }else{
         end_time=micros();
