@@ -1,17 +1,3 @@
 #include <Arduino.h>
+//Test programmatje
 
-void setup()
-{
-    Serial.begin(9600);
-    Serial.print("Start test");
-}
-
-void loop()
-{
-    int i;
-    Serial.print("1\n2\n3\n");
-    for (i=0; i<11; i++)
-    {
-        if (i==3) break;
-    }
-}
