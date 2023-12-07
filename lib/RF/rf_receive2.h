@@ -3,8 +3,8 @@
 
 #define RF_RECEIVE_PIN  2
 
-#define RF_RECEIVE_FREQ_HI  490
-#define RF_RECEIVE_FREQ_LOW 470
+#define RF_RECEIVE_FREQ_HI  1000
+#define RF_RECEIVE_FREQ_LOW 900
 
 void rf_receive_init();
 void rf_debug(float *freq, float *duty, int *detect);

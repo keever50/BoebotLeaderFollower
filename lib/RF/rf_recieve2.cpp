@@ -37,10 +37,10 @@ void rf_debug(float *freq, float *duty, int *detect)
 
 void rf_receive_ISR()
 {
-    static float start_time=0;
-    static float end_time=0;
-    static float wave_period;
-    static float wave_frequency;
+    static unsigned long start_time=0;
+    static unsigned long end_time=0;
+    static unsigned long wave_period;
+    static unsigned long wave_frequency;
     static int bit_count=0;
 
     int state = digitalRead(RF_RECEIVE_PIN);
@@ -52,8 +52,8 @@ void rf_receive_ISR()
         start_time = micros();
 
         //Calculate duty
-        float pulse_high = start_time-end_time;
-        float duty = pulse_high/wave_period;
+        unsigned long pulse_high = start_time-end_time;
+        float duty = ((float)pulse_high)/wave_period;
 
         //debug
         rf_debug_frequency=wave_frequency;
@@ -72,8 +72,8 @@ void rf_receive_ISR()
                 {
                     if(bit_count<8)
                     {
-                        bit_count=bit_count+1;
                         rf_receive_bitbuffer[bit_count]=duty;
+                        bit_count=bit_count+1;
                     }
                 }
 
