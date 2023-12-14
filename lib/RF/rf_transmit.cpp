@@ -29,9 +29,9 @@ void transmit_single(char high_low)
   */
 
   //signaal verzenden
-    digitalWrite(trans_pin, HIGH);
-    delayMicroseconds(t_hoog);
     digitalWrite(trans_pin, LOW);
+    delayMicroseconds(t_hoog);
+    digitalWrite(trans_pin, HIGH);
     delayMicroseconds(t_laag);
 }
 
