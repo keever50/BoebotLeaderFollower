@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <rf_transmit.h>
 
+
 void transmit_single(char high_low)
 {
   float periode_us;
@@ -38,7 +39,7 @@ void transmit_single(char high_low)
 
 void transmit_binary(char *array, int size)
 {
-  for(int i = 0; i < 10; i++)
+  for(int i = 0; i < 5; i++)
   {
     transmit_single(2);
   }
@@ -47,4 +48,12 @@ void transmit_binary(char *array, int size)
   {
     transmit_single(array[i]);
   }
+
+  for(int i = 0; i < 5; i++)
+  {
+    transmit_single(2);
+  }
+
+  digitalWrite(trans_pin, LOW);
+
 }
