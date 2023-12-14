@@ -5,6 +5,24 @@ volatile float rf_debug_frequency;
 volatile float rf_debug_duty;
 volatile int rf_detection;
 
+volatile char rf_receive_data_ready;
+volatile float rf_receive_bitbuffer[8]={0};
+
+char rf_receive_get_data_ready( char reset )
+{
+    char flag = rf_receive_data_ready;
+    if(reset)
+    {
+        rf_receive_data_ready=0;
+    }
+    return flag;
+}
+
+float rf_receive_get_data( int bit )
+{
+    return rf_receive_bitbuffer[bit];
+}
+
 void rf_debug(float *freq, float *duty, int *detect)
 {
     *freq=rf_debug_frequency;
@@ -19,12 +37,13 @@ void rf_debug(float *freq, float *duty, int *detect)
 
 void rf_receive_ISR()
 {
-    static float start_time=0;
-    static float end_time=0;
-    static float wave_period;
-    static float wave_frequency;
+    volatile static unsigned long start_time=0;
+    volatile static unsigned long end_time=0;
+    volatile static unsigned long wave_period;
+    volatile static unsigned long wave_frequency;
+    volatile static int bit_count=0;
 
-    int state = digitalRead(RF_RECEIVE_PIN);
+    volatile int state = digitalRead(RF_RECEIVE_PIN);
     if(state==0)
     {
         //Calculate frequency
@@ -33,19 +52,42 @@ void rf_receive_ISR()
         start_time = micros();
 
         //Calculate duty
-        float pulse_high = start_time-end_time;
-        float duty = pulse_high/wave_period;
+        unsigned long pulse_high = start_time-end_time;
+        float duty = ((float)pulse_high)/wave_period;
 
         //debug
         rf_debug_frequency=wave_frequency;
         rf_debug_duty=duty;
-        if(wave_frequency>900 && wave_frequency < 1000)
-        {
-            digitalWrite(LED_BUILTIN, HIGH);
-        }else{
-            digitalWrite(LED_BUILTIN, LOW);
-        }
 
+        //If no data has been received before
+        if(rf_receive_data_ready==0)
+        {
+            //Target frequency
+            if(wave_frequency>RF_RECEIVE_FREQ_LOW && wave_frequency < RF_RECEIVE_FREQ_HI)
+            {
+                digitalWrite(LED_BUILTIN, HIGH);
+
+                //Target duty
+                if(duty > 0.60 || duty < 0.40)
+                {
+                    if(bit_count<8)
+                    {
+                        rf_receive_bitbuffer[bit_count]=duty;
+                        bit_count=bit_count+1;
+                    }
+                }
+
+            }else{
+                digitalWrite(LED_BUILTIN, LOW);
+                if(bit_count>=8)
+                {
+                    rf_receive_data_ready=1;
+                    
+                }
+                bit_count=0;
+                
+            }
+        }
 
     }else{
         end_time=micros();
