@@ -2,7 +2,7 @@
 #include <Stepper.h>
 {
     Serial.begin(9600);
-    pinMode(Stap, OUTPUT);
+    pinMode(Stap_pin, OUTPUT);
     pinMode(Richting, OUTPUT);
 }
 
