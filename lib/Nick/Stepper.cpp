@@ -1,14 +1,9 @@
 #include <Arduino.h>
 #include <Stepper.h>
+void Stepper_innit()
 {
     Serial.begin(9600);
     pinMode(Stap_pin, OUTPUT);
-    pinMode(Richting, OUTPUT);
-}
-
-void loop()
-{
-  Stepper();
 }
 
 void Stepper()
