@@ -13,8 +13,8 @@ void loop()
 
 void Stepper()
 {
-  digitalWrite(Stap, HIGH);
+  digitalWrite(Stap_pin, HIGH);
   delay(1);
-  digitalWrite(Stap, LOW);
+  digitalWrite(Stap_pin, LOW);
   delay(1);
 }
