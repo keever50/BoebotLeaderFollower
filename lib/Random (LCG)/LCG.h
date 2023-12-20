@@ -7,5 +7,6 @@
 
 
 long LCG(void);
+char update_seed(void);
 
 #endif

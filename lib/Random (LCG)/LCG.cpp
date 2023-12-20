@@ -1,11 +1,17 @@
+#include <Arduino.h>
+#include <EEPROM.h>
+char seedlocation = 0;
+
 long LCG(void);
-update_seed(void);
+char update_seed(void);
 
-static long value = 93456; //seed definiëren
+static long value = EEPROM.read(seedlocation);
 
-update_seed(void)
+char update_seed(void)
 {
-  value = analogRead(0);
+  char newseed = EEPROM.read(seedlocation)+1;
+  EEPROM.put(seedlocation, newseed);
+  return newseed;
 }
 
 long LCG(void)
