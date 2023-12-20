@@ -4,9 +4,9 @@ const int Sensor = 8;
 
 void setup()
 {
-  Serial.beign(9600);
+  Serial.begin(9600);
   pinMode(Sensor, OUTPUT);
-  Serialprint("Start uitlezen\n");
+  Serial.print("Start uitlezen\n");
 }
 
 void loop()
