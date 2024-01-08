@@ -21,10 +21,26 @@ float echo_detect()
     delayMicroseconds(10);
     digitalWrite(ECHO_TRIGGERPIN, LOW);
     
-    duration= pulseIn(ECHO_ECHOPIN, HIGH);
-    distance= (duration * 0.0343)/2;
+    duration = echo_tijd();
+    distance = (duration * 0.0343)/2;
     Serial.print("Afstand: \n");
     Serial.print(distance);
     Serial.println();
     delay(100);
+}
+
+echo_tijd()
+{
+  unsigned long starttijd = micros();
+  while (digitalRead(ECHO_ECHOPIN) == LOW)
+  {
+    if (micros()-starttijd > max_tijd)
+    return 0;
+  }
+  starttijd = micros();
+  while (digitalRead(ECHO_ECHOPIN) == HIGH)
+  {
+      duration = micros() - starttijd;
+      return duration;
+  }
 }
