@@ -1,5 +1,6 @@
-#ifndef RFTrans_H
-#define RFTrans_H
+//Gemaakt door Xander
+
+#pragma once
 #include <Arduino.h>
 
 //Definitions
@@ -10,5 +11,3 @@
 void transmit_single(char high_low);
 void transmit_binary(char *array, int size);
 
-
-#endif

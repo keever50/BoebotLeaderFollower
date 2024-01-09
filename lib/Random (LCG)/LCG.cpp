@@ -1,3 +1,5 @@
+//Gemaakt door Xander
+
 long LCG(void);
 update_seed(void);
 
