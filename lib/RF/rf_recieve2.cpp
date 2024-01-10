@@ -103,3 +103,38 @@ void rf_receive_init( )
     attachInterrupt(digitalPinToInterrupt(RF_RECEIVE_PIN), rf_receive_ISR, CHANGE);
 }
 
+int rf_receive_char_data(void)
+{
+    if (rf_receive_get_data_ready(1)) //Check if data is ready
+    {
+        //Create array to store recieved data in binary
+        char bin_array[8];
+        for(int i = 0; i < 8; i++)
+        {
+            bin_array[i]=(rf_receive_get_data(i)<0.5);
+        }
+
+        for(int i = 0; i < 8; i++)
+        {
+            Serial.print((int)bin_array[i]);
+            Serial.print(" ");
+        }
+        Serial.println();
+
+        //Convert binary to a char
+        int char_data = 0;
+        for(int i = 0; i<8; i++)
+        {
+            char_data = char_data | bin_array[i] << i;
+        }
+        Serial.println(char_data);
+
+        return char_data;
+    }
+
+    //If no new data is ready return x
+    else
+    {
+        return 0;
+    }
+}
