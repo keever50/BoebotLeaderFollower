@@ -1,5 +1,7 @@
-#ifndef RFTrans_H
-#define RFTrans_H
+//Gemaakt door Xander
+
+#pragma once
+
 #include <Arduino.h>
 #include <EEPROM.h>
 
@@ -7,5 +9,3 @@
 
 
 long LCG(void);
-
-#endif
