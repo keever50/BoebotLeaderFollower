@@ -29,8 +29,8 @@ float echo_detect()
     delay(100);
 }
 
-echo_tijd()
-{
+  unsigned long echo_tijd()
+  {
   unsigned long starttijd = micros();
   while (digitalRead(ECHO_ECHOPIN) == LOW)
   {
