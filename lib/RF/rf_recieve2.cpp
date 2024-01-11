@@ -114,12 +114,15 @@ int rf_receive_char_data(void)
             bin_array[i]=(rf_receive_get_data(i)<0.5);
         }
 
+        /* 
+        //Print ingekomen bits
         for(int i = 0; i < 8; i++)
         {
             Serial.print((int)bin_array[i]);
             Serial.print(" ");
         }
         Serial.println();
+        */
 
         //Convert binary to a char
         int char_data = 0;
@@ -127,7 +130,6 @@ int rf_receive_char_data(void)
         {
             char_data = char_data | bin_array[i] << i;
         }
-        Serial.println(char_data);
 
         return char_data;
     }

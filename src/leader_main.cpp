@@ -1,7 +1,7 @@
 #ifdef LEADER
 #include <Arduino.h>
 #include <rf_receive2.h>
-#define led 4
+#define led 5
 
 void setup()
 {
@@ -15,8 +15,14 @@ rf_receive_init();
  
 void loop(void)
 {
+    digitalWrite(led, LOW);
+
     int last_data = rf_receive_char_data();
-    if (last_data != 0)
+    if (last_data == 195)
+    {
+        digitalWrite(led, HIGH);
+    }
+    else if(last_data != 0)
     {
         Serial.println(last_data);
     }
