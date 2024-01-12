@@ -1,17 +1,17 @@
 #include <Arduino.h>
 #include <Echo.h>
 
-void setup()
-{
-    Serial.begin(9600);
-    pinMode(ECHO_ECHOPIN, INPUT);
-    pinMode(ECHO_TRIGGERPIN, OUTPUT);
-}
+// void setup()
+// {
+//     Serial.begin(9600);
+//     pinMode(ECHO_ECHOPIN, INPUT);
+//     pinMode(ECHO_TRIGGERPIN, OUTPUT);
+// }
 
-void loop()
-{
-  echo_detect();
-}
+// void loop()
+// {
+//   echo_detect();
+// }
 
 float echo_detect()
 {
