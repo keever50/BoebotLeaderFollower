@@ -13,7 +13,7 @@
 int IR_status = 0;
 
 void toggle_drive();
-void drive(char speedl, char speedr);
+void drive(char speed1, char speed2);
 
 
 void setup()
@@ -130,8 +130,8 @@ void toggle_drive()
 
 void drive(char speed1, char speed2)
 {
-    analogWrite(speed1, speedl);
-    analogWrite(speed2, speedr);
+    analogWrite(speedl, speed1);
+    analogWrite(speedr, speed2);
 }
 
 //interrupt voor de IR leds op 38 kHz
