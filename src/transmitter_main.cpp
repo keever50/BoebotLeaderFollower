@@ -6,6 +6,7 @@
 
 void setup()
 {
+    pinMode(3, OUTPUT);
     Serial.begin(9600);
     Serial.println("Welkom in de control hub van het Follow the leader project.");
     delay(1000);
