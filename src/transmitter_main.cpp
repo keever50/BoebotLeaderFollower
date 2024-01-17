@@ -32,7 +32,10 @@ void loop()
         {
             char bitarray[8] = {0, 0, 0, 0, 0, 0, 0, 0};
             fill_binary_array(bitarray, toInt(input_buffer));
-            transmit_binary(bitarray, 8);
+            for(int i = 0; i < 3; i++)
+            {
+                transmit_binary(bitarray, 8);
+            }
             Serial.println("Geef a.u.b. de volgende input:");
         }
     }

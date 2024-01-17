@@ -51,8 +51,6 @@ void loop(void)
     static char mode = 0;
     static int command;
     command = rf_receive_char_data();
-    Serial.println(command);
-    delay(1000);
     
     switch (command)
     {
@@ -61,19 +59,16 @@ void loop(void)
     case 1: //leader stand by
         mode = 0;
         TIMSK2 &= (0 << OCIE2A);
-        Serial.println("stand by");
         break;
     case 2: //leader IR off
         TIMSK2 &= (0 << OCIE2A);
         digitalWrite(IR_leds, LOW);
         digitalWrite(IR_switch, LOW);
-        Serial.println("IR off");
         break;
     case 3: //leader IR on
         TIMSK2 |= (1 << OCIE2A);
         digitalWrite(IR_leds, HIGH);
         digitalWrite(IR_switch, HIGH);
-        Serial.println("IR on");
         break;
     case 4: //drive mode random
         mode = 1;
@@ -87,13 +82,16 @@ void loop(void)
     case 7: //speed high
         drive(200, 200);
         break;
-    case 8: 
-        drive(0, 100);
+    case 8: //turn left
+        drive(0, 50);
         break;
-    case 9:
+    case 9: //turn right
+        drive(50, 0);
+        break;
+    case 10: //stop
         drive(0, 0);
         break;
-    case 10:
+    case 11: //reverse
         toggle_drive();
         break;
 
