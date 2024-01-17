@@ -1,6 +1,6 @@
 #pragma once
 
-#define SEEKER_INTERVAL    500 //In uS interval
+#define SEEKER_INTERVAL    3000 //In uS interval
 
 #define SEEKER_STEPS_PER_READ   10
 #define SEEKER_STEP_PIN    2
@@ -10,4 +10,8 @@
 
 void seeker_init();
 char seeker_stepdetect();
-void seeker_direction(char dir);
+void seeker_direction(char dir); 
+
+void seeker_init_auto();
+void seeker_get_angle();
+
