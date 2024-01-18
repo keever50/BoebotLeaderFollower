@@ -1,3 +1,5 @@
+// Geschreven door Xander
+
 #ifdef TRANSMITTER
 
 #include <Arduino.h>
@@ -27,6 +29,7 @@ void loop()
             input_buffer[i] = 0;
         }
         Serial.readBytes(input_buffer, 32);
+        Serial.println(toInt(input_buffer));
         
         if ((toInt(input_buffer) < 0) || (toInt(input_buffer) > 256))
         {

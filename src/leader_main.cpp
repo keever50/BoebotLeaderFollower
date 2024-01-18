@@ -1,14 +1,15 @@
+// Geschreven door Xander
+
 #ifdef LEADER
 #include <Arduino.h>
 #include <rf_receive2.h>
 
 #define IR_leds 9
-#define IR_switch 7
 
 #define speedr 10
 #define motorr 12
-#define speedl 11
-#define motorl 13
+#define speedl 6
+#define motorl 7
 
 int IR_status = 0;
 
@@ -24,11 +25,13 @@ pinMode(2, INPUT);
 pinMode(IR_leds, OUTPUT);
 digitalWrite(IR_leds, LOW);
 
-pinMode(IR_switch, OUTPUT);
-digitalWrite(IR_switch, LOW);
-
 pinMode(motorr, OUTPUT);
 pinMode(motorl, OUTPUT);
+
+pinMode(11, OUTPUT);
+pinMode(13, OUTPUT);
+digitalWrite(11, LOW);
+digitalWrite(13, LOW);
 
 noInterrupts();
 rf_receive_init();
@@ -37,7 +40,7 @@ rf_receive_init();
 TCCR2A = 0;
 TCCR2B = 0;
 TCCR2B |= (1 << WGM21);
-TIMSK2 |= (1 << OCIE2A);
+TIMSK2 |= 0;
 OCR2A = 8;
 TCCR2B |= (1 << CS11);
 
@@ -61,19 +64,19 @@ void loop(void)
     case 1: //leader stand by
         Serial.println("case 1");
         mode = 0;
+        drive(0, 0);
+        drive(0, 0);
         TIMSK2 &= (0 << OCIE2A);
         break;
     case 2: //leader IR off
         Serial.println("case 2");
-        TIMSK2 &= (0 << OCIE2A);
+        TIMSK2 = 0;
         digitalWrite(IR_leds, LOW);
-        digitalWrite(IR_switch, LOW);
         break;
     case 3: //leader IR on
         Serial.println("case 3");
         TIMSK2 |= (1 << OCIE2A);
         digitalWrite(IR_leds, HIGH);
-        digitalWrite(IR_switch, HIGH);
         break;
     case 4: //drive mode random
         Serial.println("case 4");
@@ -81,23 +84,23 @@ void loop(void)
         break;
     case 5: //speed low
         Serial.println("case 5");
-        drive(100, 100);
+        drive(60, 60);
         break;
     case 6: //speed medium
         Serial.println("case 6");
-        drive(150, 150);
+        drive(70, 70);
         break;
     case 7: //speed high
         Serial.println("case 7");
-        drive(200, 200);
+        drive(80, 80);
         break;
     case 8: //turn left
         Serial.println("case 8");
-        drive(0, 50);
+        drive(0, 70);
         break;
     case 9: //turn right
         Serial.println("case 9");
-        drive(50, 0);
+        drive(70, 0);
         break;
     case 10: //stop
         Serial.println("case 10");
@@ -106,6 +109,9 @@ void loop(void)
     case 11: //reverse
         Serial.println("case 11");
         toggle_drive();
+        break;
+    case 12:
+        drive(250, 250);
         break;
 
     }
