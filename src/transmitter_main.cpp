@@ -1,3 +1,5 @@
+// Geschreven door Xander
+
 #ifdef TRANSMITTER
 
 #include <Arduino.h>
@@ -6,6 +8,7 @@
 
 void setup()
 {
+    pinMode(3, OUTPUT);
     Serial.begin(9600);
     Serial.println("Welkom in de control hub van het Follow the leader project.");
     delay(1000);
@@ -21,8 +24,13 @@ void loop()
 
     if(Serial.available() > 0)
     {
+        for(int i=0;i<32;i++)
+        {
+            input_buffer[i] = 0;
+        }
         Serial.readBytes(input_buffer, 32);
-
+        Serial.println(toInt(input_buffer));
+        
         if ((toInt(input_buffer) < 0) || (toInt(input_buffer) > 256))
         {
             Serial.println("Ongeoorloofde input, geef a.u.b. een geldige input");
@@ -31,7 +39,10 @@ void loop()
         {
             char bitarray[8] = {0, 0, 0, 0, 0, 0, 0, 0};
             fill_binary_array(bitarray, toInt(input_buffer));
-            transmit_binary(bitarray, 8);
+            for(int i = 0; i < 3; i++)
+            {
+                transmit_binary(bitarray, 8);
+            }
             Serial.println("Geef a.u.b. de volgende input:");
         }
     }

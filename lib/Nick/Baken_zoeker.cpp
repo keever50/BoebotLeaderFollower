@@ -8,7 +8,7 @@ void Aflezen_Ir_sensor();
 void setup()
 {
   Serial.begin(9600);
-  pinMode(Ir_Sensorpin, OUTPUT);
+  pinMode(Ir_Sensorpin, INPUT);
   pinMode(Stap_pin, OUTPUT);
   Serial.print("Start uitlezen\n");
 }
