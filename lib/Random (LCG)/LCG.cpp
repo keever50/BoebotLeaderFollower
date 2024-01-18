@@ -1,3 +1,6 @@
+//Gemaakt door Xander
+
+
 #include <Arduino.h>
 #include <EEPROM.h>
 char seedlocation = 0;

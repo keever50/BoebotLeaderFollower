@@ -3,66 +3,80 @@
 
 #ifdef FOLLOWER
 #include <Arduino.h>
-#include <rf_receive2.h>
+#include <pwmgen1.h>
+#include <zoeker.h>
+
+//Consumption: 0.36A @ 12.0V
 
 void setup() {
+
   Serial.begin(115200);
-  rf_receive_init();
-
+  
+  pwmgen1_clock_mode( 2 );
+  pwmgen1_start();
+  
+  
+  pwmgen1_set_frequency( 50 );
+  pwmgen1_set_duty_A(0.075-0.0);
+  pwmgen1_set_duty_B(0.075+0.0);
+  
+  seeker_init();
+  seeker_init_auto();
 }
 
+int t;
+float beacon_angle=180;
 void loop() {
-  // put your main code here, to run repeatedly:
+  delay(100);
+  //int a = seeker_stepdetect();
+  //Serial.println(a);
 
-  if(rf_receive_get_data_ready(0))
+  //Serial.println(seeker_get_step());
+
+
+  if(seeker_did_full_revolution(1)==1)
   {
-    for(int i=0;i<8;i++)
+    float avg=0;
+    float count=0;
+    for(int i=0;i<SEEKER_STEPS_PER_REVOLUTION;i++)
     {
-      float bit = rf_receive_get_data(i);
-      if(bit<0.5)
+      char det = seeker_get_detections(i);
+      if(det)
       {
-        Serial.print("1");
-      }else{
-        Serial.print("0");
+        Serial.print("Detection on ");
+        Serial.println(i);
+        avg=avg+i;
+        count++;
       }
-      
     }
-    Serial.println("");
-    for(int i=0;i<8;i++)
-    {
-      float bit = rf_receive_get_data(i);
-      Serial.print(bit);
-      Serial.print(" ");
-      
-    }
-    Serial.println("");
+    avg=avg/count;
+    Serial.print("Average: ");
+    Serial.println(avg);
 
-    rf_receive_get_data_ready(1);
+    float ratio = avg/(SEEKER_STEPS_PER_REVOLUTION);
+    Serial.print("Deg: ");
+    beacon_angle=ratio*360;
+    Serial.println(beacon_angle);
+    
+
+    /*Steering*/
+    const float max_steering=0.05;
+    float steer = (beacon_angle-180)/(180*8);
+    steer=steer*max_steering;
+    if(steer>max_steering){steer=max_steering;}
+    if(steer<-max_steering){steer=-max_steering;}
+    
+    pwmgen1_set_duty_A(0.075+steer);
   }
-  delay(50);
+
+
+
+
 }
 
 
-// #include <Arduino.h>
-// #include <rf_transmit.h>
-
-// void setup()
-// {
-//   pinMode(trans_pin, OUTPUT);
-// }
-// void loop()
-// {
-
-//   char bits[] = {1,1,0,0,1,0,1,0};
-//   for(int i=0; i<10;i++)
-//   {
-//     transmit_binary(bits, sizeof(bits)); 
-//     delay(50); 
-//   }
 
 
-//   delay(20000);
-// }
 
 #endif
 
