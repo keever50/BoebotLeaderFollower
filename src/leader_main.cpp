@@ -51,47 +51,60 @@ void loop(void)
     static char mode = 0;
     static int command;
     command = rf_receive_char_data();
+
+    if(command != 0){Serial.println(command);}
     
     switch (command)
     {
     case 0: //do nothing
         break;
     case 1: //leader stand by
+        Serial.println("case 1");
         mode = 0;
         TIMSK2 &= (0 << OCIE2A);
         break;
     case 2: //leader IR off
+        Serial.println("case 2");
         TIMSK2 &= (0 << OCIE2A);
         digitalWrite(IR_leds, LOW);
         digitalWrite(IR_switch, LOW);
         break;
     case 3: //leader IR on
+        Serial.println("case 3");
         TIMSK2 |= (1 << OCIE2A);
         digitalWrite(IR_leds, HIGH);
         digitalWrite(IR_switch, HIGH);
         break;
     case 4: //drive mode random
+        Serial.println("case 4");
         mode = 1;
         break;
     case 5: //speed low
+        Serial.println("case 5");
         drive(100, 100);
         break;
     case 6: //speed medium
+        Serial.println("case 6");
         drive(150, 150);
         break;
     case 7: //speed high
+        Serial.println("case 7");
         drive(200, 200);
         break;
     case 8: //turn left
+        Serial.println("case 8");
         drive(0, 50);
         break;
     case 9: //turn right
+        Serial.println("case 9");
         drive(50, 0);
         break;
     case 10: //stop
+        Serial.println("case 10");
         drive(0, 0);
         break;
     case 11: //reverse
+        Serial.println("case 11");
         toggle_drive();
         break;
 
