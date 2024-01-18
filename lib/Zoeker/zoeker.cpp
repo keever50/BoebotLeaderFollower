@@ -108,3 +108,29 @@ int seeker_get_step()
 {
     return seeker_current_step;
 }
+
+float seeker_get_degrees()
+{
+    float avg=0.0;
+    float count=0.0;
+
+    /*Averaging the IR detections*/
+    for(int i=0;i<SEEKER_STEPS_PER_REVOLUTION;i++)
+    {
+      char det = seeker_get_detections(i);
+      if(det)
+      {
+        Serial.print("Detection on ");
+        Serial.println(i);
+        avg=avg+i;
+        count++;
+      }
+    }
+    avg=avg/count;
+
+    /*Converting to degrees*/
+    float ratio = avg/(SEEKER_STEPS_PER_REVOLUTION);
+    float beacon_angle=ratio*360.0; 
+
+    return beacon_angle;
+}
