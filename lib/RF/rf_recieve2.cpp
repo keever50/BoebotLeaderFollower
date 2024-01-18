@@ -1,4 +1,4 @@
-// Gemaakt door Kevin 
+// Gemaakt door Kevin Witteveen met aanvulling van Xander Perry
 
 #include <rf_receive2.h>
 #include <Arduino.h>

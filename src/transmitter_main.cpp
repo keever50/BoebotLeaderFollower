@@ -1,4 +1,4 @@
-// Geschreven door Xander
+// Geschreven door Xander Perry
 
 #ifdef TRANSMITTER
 
