@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include <pwmgen1.h>
 #include <seeker.h>
+#include <echo.h>
 
 //Consumption: 0.36A @ 12.0V
 
@@ -16,8 +17,8 @@
 
 #define NAVIGATION_BIG_ANGLE_STEERING_SPEED 0.03f
 #define NAVIGATION_STEERING_MULTIPLIER 0.001f
-
 #define NAVIGATION_FORWARD_SPEED  0.04f
+#define NAVIGATION_FRONT_CLEARANCE  30
 
 /*State machine state cases*/
 #define STATE_SEARCH        0
@@ -74,7 +75,9 @@ void setup() {
   seeker_init();
   seeker_init_auto();
 
-
+  /*Initialize echo*/
+  echo_init();
+  
   beep(1000, 300);
   beep(2000, 400);
   beep(3000, 500);
@@ -84,9 +87,11 @@ void setup() {
 }
 
 int state;
+int prev_state;
 float nav_degrees=SEEKER_NOTHING_FOUND;
 void loop() {
   delay(10);
+
 
   /*Navigation state machine*/
   switch(state)
@@ -164,6 +169,13 @@ void loop() {
           break;
         }
 
+        /*Obstacle detect*/
+        if(echo_detect() < NAVIGATION_FRONT_CLEARANCE)
+        {
+          state = STATE_BLOCKED;
+          break;
+        }
+
         /*Navigation angle hysteresis*/
         if(abs(nav_degrees)>NAVIGATION_BIG_ANGLE)
         {
@@ -189,7 +201,16 @@ void loop() {
     /*Something is infront of me. Dont move*/
     case STATE_BLOCKED:
     {
-
+      delay(250);
+      beep(5000,50);
+      if(echo_detect() > NAVIGATION_FRONT_CLEARANCE)
+      {
+        state = STATE_MOVE_TOWARDS;
+        break;
+      }else{
+        wheels(0,0);
+      }
+      break;
     }
   }
 
