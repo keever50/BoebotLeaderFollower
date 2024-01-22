@@ -7,7 +7,7 @@ void setup()
 {
   noInterrupts();
   Serial.begin(9600);
-  rf_receive_init;
+  rf_receive_init();
   pinMode(IRpin, OUTPUT);
   pinMode(13, OUTPUT);
   TCCR1A = 0;     
@@ -27,14 +27,14 @@ ISR(TIMER1_COMPA_vect)
 
 void loop()
 {
-  if(rf_recieve_char_data()==60);
+  if(rf_recieve_char_data()==60)
   {
     interrupts();
   }
 
   else
   {
-    
+
   }
 }
 
