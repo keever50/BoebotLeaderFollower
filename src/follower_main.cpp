@@ -27,7 +27,7 @@ void setup() {
 int t;
 float beacon_angle=180;
 void loop() {
-  delay(100);
+  delay(10);
   //int a = seeker_stepdetect();
   //Serial.println(a);
 
@@ -36,37 +36,45 @@ void loop() {
 
   if(seeker_did_full_revolution(1)==1)
   {
-    float avg=0;
-    float count=0;
-    for(int i=0;i<SEEKER_STEPS_PER_REVOLUTION;i++)
-    {
-      char det = seeker_get_detections(i);
-      if(det)
-      {
-        Serial.print("Detection on ");
-        Serial.println(i);
-        avg=avg+i;
-        count++;
-      }
-    }
-    avg=avg/count;
-    Serial.print("Average: ");
-    Serial.println(avg);
-
-    float ratio = avg/(SEEKER_STEPS_PER_REVOLUTION);
-    Serial.print("Deg: ");
-    beacon_angle=ratio*360;
-    Serial.println(beacon_angle);
+    float beacon_angle = seeker_get_degrees();
     
 
     /*Steering*/
-    const float max_steering=0.05;
-    float steer = (beacon_angle-180)/(180*8);
-    steer=steer*max_steering;
-    if(steer>max_steering){steer=max_steering;}
-    if(steer<-max_steering){steer=-max_steering;}
+    const float max_input=0.05;
+    const float max_steer=0.001;
+    const float steering_sensitivity=50.0;
+    const float max_throttle=0.001;
+    const int angle_to_steer=50;
+    float input_L=0;
+    float input_R=0;
     
-    pwmgen1_set_duty_A(0.075+steer);
+    float steer = (beacon_angle-180.0)/(180.0*steering_sensitivity);
+    if(steer>max_steer){steer=max_steer;}
+    if(steer<-max_steer){steer=-max_steer;}
+    
+    if(steer>0)
+    {
+      input_L=input_L+steer;
+    }else{
+      input_R=input_R-steer;    
+    }
+
+    if(abs(beacon_angle-180)<angle_to_steer)
+    {
+      input_L=input_L-max_throttle;   
+      input_R=input_R-max_throttle;   
+    }  
+
+
+    if(input_L>max_input){input_L=max_input;}
+    if(input_L<-max_input){input_L=-max_input;}
+    if(input_R>max_input){input_R=max_input;}
+    if(input_R<-max_input){input_R=-max_input;}
+
+
+    pwmgen1_set_duty_A(0.075+input_L);
+    pwmgen1_set_duty_B(0.075-input_R);
+
   }
 
 
