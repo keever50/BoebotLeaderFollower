@@ -1,4 +1,4 @@
-// Geschreven door Xander
+// Geschreven door Xander Perry
 
 #ifdef TRANSMITTER
 
@@ -24,12 +24,11 @@ void loop()
 
     if(Serial.available() > 0)
     {
-        for(int i=0;i<32;i++)
+        for(int i=0;i<15;i++)
         {
             input_buffer[i] = 0;
         }
         Serial.readBytes(input_buffer, 32);
-        Serial.println(toInt(input_buffer));
         
         if ((toInt(input_buffer) < 0) || (toInt(input_buffer) > 256))
         {
@@ -46,8 +45,6 @@ void loop()
             Serial.println("Geef a.u.b. de volgende input:");
         }
     }
-    
-    delay(10);
 }
 
 #endif

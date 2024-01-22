@@ -1,10 +1,11 @@
-// Geschreven door Xander
+// Geschreven door Xander Perry
 
 #ifdef LEADER
 #include <Arduino.h>
 #include <rf_receive2.h>
 
 #define IR_leds 9
+#define buzzer 4
 
 #define speedr 10
 #define motorr 12
@@ -25,6 +26,9 @@ pinMode(2, INPUT);
 pinMode(IR_leds, OUTPUT);
 digitalWrite(IR_leds, LOW);
 
+pinMode(buzzer, OUTPUT);
+digitalWrite(buzzer, LOW);
+
 pinMode(motorr, OUTPUT);
 pinMode(motorl, OUTPUT);
 
@@ -40,7 +44,7 @@ rf_receive_init();
 TCCR2A = 0;
 TCCR2B = 0;
 TCCR2B |= (1 << WGM21);
-TIMSK2 |= 0;
+TIMSK2 |= (1 << OCIE2A);
 OCR2A = 8;
 TCCR2B |= (1 << CS11);
 
@@ -51,84 +55,85 @@ interrupts();
  
 void loop(void)
 {
-    static char mode = 0;
+    static int speed = 0;
     static int command;
     command = rf_receive_char_data();
 
-    if(command != 0){Serial.println(command);}
-    
     switch (command)
     {
-    case 0: //do nothing
+    case 0: // pass if no incoming command
         break;
-    case 1: //leader stand by
-        Serial.println("case 1");
-        mode = 0;
-        drive(0, 0);
-        drive(0, 0);
-        TIMSK2 &= (0 << OCIE2A);
+    case 60: // l:   toggle leds
+    {
+        static char toggle_led = 1;
+        if(toggle_led)
+        {
+            TIMSK2 = 0;
+            digitalWrite(IR_leds, LOW);
+            toggle_led = 0;
+        }
+        else
+        {
+            TIMSK2 |= (1 << OCIE2A);
+            digitalWrite(IR_leds, HIGH);
+            toggle_led = 1;
+        }
         break;
-    case 2: //leader IR off
-        Serial.println("case 2");
-        TIMSK2 = 0;
-        digitalWrite(IR_leds, LOW);
-        break;
-    case 3: //leader IR on
-        Serial.println("case 3");
-        TIMSK2 |= (1 << OCIE2A);
-        digitalWrite(IR_leds, HIGH);
-        break;
-    case 4: //drive mode random
-        Serial.println("case 4");
-        mode = 1;
-        break;
-    case 5: //speed low
-        Serial.println("case 5");
-        drive(60, 60);
-        break;
-    case 6: //speed medium
-        Serial.println("case 6");
-        drive(70, 70);
-        break;
-    case 7: //speed high
-        Serial.println("case 7");
-        drive(80, 80);
-        break;
-    case 8: //turn left
-        Serial.println("case 8");
-        drive(0, 70);
-        break;
-    case 9: //turn right
-        Serial.println("case 9");
-        drive(70, 0);
-        break;
-    case 10: //stop
-        Serial.println("case 10");
-        drive(0, 0);
-        break;
-    case 11: //reverse
-        Serial.println("case 11");
-        toggle_drive();
-        break;
-    case 12:
-        drive(250, 250);
-        break;
-
     }
 
-    switch (mode)
-    {
-    case 0:// stand by
-        /* code */
+    case 66: // r:    Reverse drive direction 
+        toggle_drive();
+        break;
+        
+    case 71: // w:    Accelerate
+        if (speed >= 70)
+        {
+            speed += 10;
+        }
+        else
+        {
+            speed = 70;
+        }
+        drive(speed, speed);
+        break;
+
+    case 67: // s:     Decelerate
+        if (speed > 70)
+        {
+            speed -= 10;
+        }
+        else
+        {
+            speed = 0;
+        }
+        drive(speed, speed);
         break;
     
-    case 1:// drive mode random
-        /* code */
+    case 49: // a:      Turn left
+        drive(70, 100);
+        delay(1500);
+        drive(speed, speed);
+        break;
+    
+    case 52: // d:     Turn right
+        drive(100, 70);
+        delay(1500);
+        drive(speed, speed);
+        break;
+    
+    case 53: // e:     Stop driving
+        drive(0, 0);
+        break;
+
+    default: // Signal for unknown command
+        digitalWrite(buzzer, HIGH);
+        delay(200);
+        digitalWrite(buzzer, LOW);
         break;
     }
 }
 
-void toggle_drive()
+void toggle_drive(void)
 {
     static char toggle = 0;
     if(toggle)
@@ -167,29 +172,3 @@ void drive(char speed1, char speed2)
 }
 
 #endif
-
-
-
-
-// if (rf_receive_get_data_ready(1))
-// {
-//     char bin_array[8];
-//     for(int i = 0; i < 8; i++)
-//     {
-//         bin_array[i]=(rf_receive_get_data(i)<0.5);
-//     }
-
-//     for(int i = 0; i < 8; i++)
-//     {
-//         Serial.print((int)bin_array[i]);
-//         Serial.print(" ");
-//     }
-//
-// Serial.println();
-// }
-// else
-// {
-//     Serial.println("No data");    
-// }
-// delay(1000);
-// }

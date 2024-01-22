@@ -1,4 +1,4 @@
-//Gemaakt door Xander
+//Gemaakt door Xander Perry
 
 #include <Arduino.h>
 #include <rf_transmit.h>

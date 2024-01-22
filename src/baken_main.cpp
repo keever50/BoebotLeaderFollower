@@ -1,20 +1,31 @@
 #ifdef BAKEN
 #include <Arduino.h>
+#include <rf_receive2.h>
+#define IRpin 9
+char i;
+char flag = 60;
 
 void setup()
 {
-Serial.begin(9600);
-  pinMode(9, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+
+  noInterrupts();
+  Serial.begin(9600);
+  rf_receive_init();
+  pinMode(IRpin, OUTPUT);
   pinMode(13, OUTPUT);
-  TCCR1A = 0;     // set entire TCCR1A register to 0
-  TCCR1B = 0;     // same for TCCR1B
+  TCCR1A = 0;     
+  TCCR1B = 0;     
   TCCR1A |= (1 << COM1A0);
-  TCCR1B |= (1 << CS11) | (1<< WGM12);  // 8 prescaler
+  TCCR1B |= (1 << CS11) | (1<< WGM12);  
   TIMSK1 |= (1 << OCIE1A);
   OCR1A = (F_CPU/16)/38500;
+  interrupts();
 }
 
-ISR(TIMER1_COMPA_vect)//timer1 interrupt 1Hz toggles pin 13 (LED
+ISR(TIMER1_COMPA_vect)
 {
     static int t;
     digitalWrite(13, t);
@@ -23,7 +34,29 @@ ISR(TIMER1_COMPA_vect)//timer1 interrupt 1Hz toggles pin 13 (LED
 
 void loop()
 {
-    delay(500);
+  if(flag==60)
+  {
+    i=5;
+    digitalWrite(i, HIGH);
+    delay(100);
+    digitalWrite(i, LOW);
+    delay(100);
+  }
+
+  else
+  {
+    for(i=3; i<=4; i++)
+    {
+      digitalWrite(i, HIGH);
+      delay(200);
+      digitalWrite(i, LOW);
+      delay(200);
+      digitalWrite(i, HIGH);
+      digitalWrite(i, HIGH);
+      delay(200);
+    }
+  }
+   
 }
 
 #endif
