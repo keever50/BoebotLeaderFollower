@@ -109,7 +109,7 @@ int rf_receive_char_data(void)
 {
     if (rf_receive_get_data_ready(1)) //Check if data is ready
     {
-        //Create array to store recieved data in binary
+        //Create array to store received data in binary
         char bin_array[8];
         for(int i = 0; i < 8; i++)
         {
