@@ -1,82 +1,180 @@
-//#define FOLLOWER
-//#define LEADER
+/*Geschreven door Kevin Witteveen*/
+/*Written by Kevin Witteveen*/
 
 #ifdef FOLLOWER
 #include <Arduino.h>
 #include <pwmgen1.h>
-#include <zoeker.h>
+#include <seeker.h>
 
 //Consumption: 0.36A @ 12.0V
+
+#define WHEELS_MAX_VARIATION  0.05
+
+/*Navigation angle hysteresis*/
+#define NAVIGATION_BIG_ANGLE  25 /*Above this angle, do a big turn*/
+#define NAVIGATION_SMALL_ANGLE 10 /*Below this angle, do a normal turn and move*/
+
+#define NAVIGATION_BIG_ANGLE_STEERING_SPEED 0.03f
+#define NAVIGATION_STEERING_MULTIPLIER 0.001f
+
+#define NAVIGATION_FORWARD_SPEED  0.04f
+
+/*State machine state cases*/
+#define STATE_SEARCH        0
+#define STATE_BIG_TURN      1
+#define STATE_MOVE_TOWARDS  2
+#define STATE_BLOCKED       3
+
+void beep(int freq, int dur)
+{
+  static int t;
+  for(int i=0;i<dur;i++)
+  {
+    delayMicroseconds(1000000/freq);
+    digitalWrite(13, t);
+    t=!t;
+  }
+
+  digitalWrite(13, 0);
+}
+
+float limit(float in, float min, float max )
+{
+  if(in>max) in=max;
+  if(in<min) in=min;
+  return in;
+}
+
+/*from -1 to 1.*/
+void wheels( float L, float R )
+{
+  L=L*WHEELS_MAX_VARIATION;
+  R=R*WHEELS_MAX_VARIATION;
+
+  limit(L,-WHEELS_MAX_VARIATION,WHEELS_MAX_VARIATION);
+  limit(R,-WHEELS_MAX_VARIATION,WHEELS_MAX_VARIATION);
+  pwmgen1_set_duty_A(0.075-L);
+  pwmgen1_set_duty_B(0.075+R);
+}
+
 
 void setup() {
 
   Serial.begin(115200);
   
+  /*Initialize servos*/
   pwmgen1_clock_mode( 2 );
   pwmgen1_start();
-  
-  
   pwmgen1_set_frequency( 50 );
   pwmgen1_set_duty_A(0.075-0.0);
   pwmgen1_set_duty_B(0.075+0.0);
   
+  /*Initialize steppers and seeker*/
   seeker_init();
   seeker_init_auto();
+
+  delay(1000);
 }
 
-int t;
-float beacon_angle=180;
+int state;
+float nav_degrees=SEEKER_NOTHING_FOUND;
 void loop() {
   delay(10);
-  //int a = seeker_stepdetect();
-  //Serial.println(a);
 
-  //Serial.println(seeker_get_step());
-
-
-  if(seeker_did_full_revolution(1)==1)
+  switch(state)
   {
-    float beacon_angle = seeker_get_degrees();
-    
 
-    /*Steering*/
-    const float max_input=0.05;
-    const float max_steer=0.001;
-    const float steering_sensitivity=50.0;
-    const float max_throttle=0.001;
-    const int angle_to_steer=50;
-    float input_L=0;
-    float input_R=0;
-    
-    float steer = (beacon_angle-180.0)/(180.0*steering_sensitivity);
-    if(steer>max_steer){steer=max_steer;}
-    if(steer<-max_steer){steer=-max_steer;}
-    
-    if(steer>0)
+    case STATE_SEARCH:
     {
-      input_L=input_L+steer;
-    }else{
-      input_R=input_R-steer;    
+      if(seeker_did_full_revolution(SEEKER_READ_FLAG))
+      {
+        /*On detection do*/
+        nav_degrees=seeker_get_degrees();
+        if(nav_degrees!=SEEKER_NOTHING_FOUND)
+        {
+          state = STATE_BIG_TURN;
+          break;
+        }
+
+        seeker_did_full_revolution(SEEKER_RESET_FLAG);
+      }else{
+        delay(2500);
+        beep(500, 100);
+      }
+      break;
     }
 
-    if(abs(beacon_angle-180)<angle_to_steer)
+    case STATE_BIG_TURN:
     {
-      input_L=input_L-max_throttle;   
-      input_R=input_R-max_throttle;   
-    }  
+      if(seeker_did_full_revolution(SEEKER_READ_FLAG))
+      {
+        /*On detection do*/
+        nav_degrees=seeker_get_degrees();
 
+        if(nav_degrees==SEEKER_NOTHING_FOUND)
+        {
+          state=STATE_SEARCH;
+          wheels(0,0);
+          break;
+        }
 
-    if(input_L>max_input){input_L=max_input;}
-    if(input_L<-max_input){input_L=-max_input;}
-    if(input_R>max_input){input_R=max_input;}
-    if(input_R<-max_input){input_R=-max_input;}
+        /*Navigation angle hysteresis*/
+        if(abs(nav_degrees)<NAVIGATION_SMALL_ANGLE)
+        {
+          beep(4000, 50);
+          beep(6000, 50);
+          state = STATE_MOVE_TOWARDS;
+          break;
+        }
 
+        /*Steering*/
+        if(nav_degrees>0)
+        {
+          wheels(NAVIGATION_BIG_ANGLE_STEERING_SPEED,0);
+        }else{
+          wheels(0,NAVIGATION_BIG_ANGLE_STEERING_SPEED);
+        }
 
-    pwmgen1_set_duty_A(0.075+input_L);
-    pwmgen1_set_duty_B(0.075-input_R);
+        seeker_did_full_revolution(SEEKER_RESET_FLAG);
+      }     
+      break;
+    }
 
+    case STATE_MOVE_TOWARDS:
+    {
+      if(seeker_did_full_revolution(SEEKER_READ_FLAG))
+      {
+        /*On detection do*/
+        nav_degrees=seeker_get_degrees();
+        if(nav_degrees==SEEKER_NOTHING_FOUND)
+        {
+          state=STATE_SEARCH;
+          wheels(0,0);
+          break;
+        }
+
+        /*Navigation angle hysteresis*/
+        if(abs(nav_degrees)>NAVIGATION_BIG_ANGLE)
+        {
+          beep(1000, 200);
+          state = STATE_BIG_TURN;
+          break;
+        }
+
+        /*Steering*/
+        float steer = abs(nav_degrees)*NAVIGATION_STEERING_MULTIPLIER;
+        if(nav_degrees>0)
+        {
+          wheels(steer+NAVIGATION_FORWARD_SPEED,NAVIGATION_FORWARD_SPEED);
+        }else{
+          wheels(NAVIGATION_FORWARD_SPEED,steer+NAVIGATION_FORWARD_SPEED);
+        }        
+
+        seeker_did_full_revolution(SEEKER_RESET_FLAG);
+      }   
+      break;   
+    }
   }
-
 
 
 

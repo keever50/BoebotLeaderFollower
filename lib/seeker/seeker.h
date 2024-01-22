@@ -1,5 +1,10 @@
 #pragma once
 
+#define SEEKER_NOTHING_FOUND    6000
+
+#define SEEKER_RESET_FLAG   0x1
+#define SEEKER_READ_FLAG    0x0
+
 /*For the old code*/
 #define SEEKER_INTERVAL    300 //In uS interval
 #define SEEKER_STEPS_PER_READ   10
