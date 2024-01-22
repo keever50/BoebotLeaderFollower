@@ -1,3 +1,5 @@
+// Geschreven door Xander Perry
+
 #ifdef TRANSMITTER
 
 #include <Arduino.h>
@@ -22,8 +24,13 @@ void loop()
 
     if(Serial.available() > 0)
     {
+        for(int i=0;i<32;i++)
+        {
+            input_buffer[i] = 0;
+        }
         Serial.readBytes(input_buffer, 32);
-
+        Serial.println(toInt(input_buffer));
+        
         if ((toInt(input_buffer) < 0) || (toInt(input_buffer) > 256))
         {
             Serial.println("Ongeoorloofde input, geef a.u.b. een geldige input");

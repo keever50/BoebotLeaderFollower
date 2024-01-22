@@ -1,5 +1,8 @@
+// Geschreven door Kevind en Xander
+
 #include <stdio.h>
 
+// Geschreven door Kevin
 int toInt( char* str )
 {
     /*Get length*/
@@ -20,6 +23,7 @@ int toInt( char* str )
     return result;
 }
 
+// Geschreven door Xander
 void fill_binary_array(char* array, int input)
 {
     for(int i=0; i<8; i++)

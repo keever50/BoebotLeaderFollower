@@ -1,4 +1,4 @@
-//Gemaakt door Xander
+// Geschreven door Xander
 
 
 #include <Arduino.h>

@@ -1,4 +1,4 @@
-//Gemaakt door Kevin
+// Gemaakt door Kevin Witteveen met aanvulling van Xander Perry
 
 #include <rf_receive2.h>
 #include <Arduino.h>
@@ -103,6 +103,8 @@ void rf_receive_init( )
     attachInterrupt(digitalPinToInterrupt(RF_RECEIVE_PIN), rf_receive_ISR, CHANGE);
 }
 
+
+// Aanvulling van Xander
 int rf_receive_char_data(void)
 {
     if (rf_receive_get_data_ready(1)) //Check if data is ready
