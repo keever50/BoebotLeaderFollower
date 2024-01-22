@@ -111,13 +111,13 @@ void loop(void)
     
     case 49: // a:      Turn left
         drive(70, 100);
-        delay(3000);
+        delay(1500);
         drive(speed, speed);
         break;
     
     case 52: // d:     Turn right
         drive(100, 70);
-        delay(3000);
+        delay(1500);
         drive(speed, speed);
         break;
     

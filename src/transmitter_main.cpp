@@ -24,7 +24,7 @@ void loop()
 
     if(Serial.available() > 0)
     {
-        for(int i=0;i<3;i++)
+        for(int i=0;i<15;i++)
         {
             input_buffer[i] = 0;
         }
