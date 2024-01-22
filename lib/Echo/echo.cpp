@@ -1,5 +1,7 @@
+/*Geschreven door Nick*/
+
 #include <Arduino.h>
-#include <Echo.h>
+#include <echo.h>
 
 // void setup()
 // {
@@ -13,6 +15,12 @@
 //   echo_detect();
 // }
 
+void echo_init()
+{
+  pinMode(ECHO_ECHOPIN, INPUT);
+  pinMode(ECHO_TRIGGERPIN, OUTPUT); 
+}
+
 float echo_detect()
 {
     digitalWrite(ECHO_TRIGGERPIN, LOW);
@@ -23,10 +31,11 @@ float echo_detect()
     
     duration = echo_tijd();
     distance = (duration * 0.0343)/2;
-    Serial.print("Afstand: \n");
-    Serial.print(distance);
-    Serial.println();
-    delay(100);
+    // Serial.print("Afstand: \n");
+    // Serial.print(distance);
+    // Serial.println();
+    // delay(100);
+    return distance;
 }
 
   unsigned long echo_tijd()

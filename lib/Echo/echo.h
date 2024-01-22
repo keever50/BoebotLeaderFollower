@@ -1,3 +1,5 @@
+/*Geschreven door Nick*/
+
 #pragma once
 #define ECHO_TRIGGERPIN 7
 #define ECHO_ECHOPIN 4
@@ -5,5 +7,5 @@
 float distance;
 unsigned long duration;
 float echo_detect();
-void echo_innit();
+void echo_init();
 unsigned long echo_tijd();

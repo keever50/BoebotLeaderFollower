@@ -1,3 +1,5 @@
+/*Geschreven/Written by Kevin Witteveen*/
+
 #include <seeker.h>
 #include <Arduino.h>
 

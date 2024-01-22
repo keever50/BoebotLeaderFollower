@@ -1,3 +1,5 @@
+/*Geschreven/Written by Kevin Witteveen*/
+
 #pragma once
 
 #define SEEKER_NOTHING_FOUND    6000

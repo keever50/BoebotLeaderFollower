@@ -25,10 +25,11 @@
 #define STATE_MOVE_TOWARDS  2
 #define STATE_BLOCKED       3
 
-void beep(int freq, int dur)
+/*Simple beep function*/
+void beep(int freq, int len)
 {
   static int t;
-  for(int i=0;i<dur;i++)
+  for(int i=0;i<len;i++)
   {
     delayMicroseconds(1000000/freq);
     digitalWrite(13, t);
@@ -73,6 +74,12 @@ void setup() {
   seeker_init();
   seeker_init_auto();
 
+
+  beep(1000, 300);
+  beep(2000, 400);
+  beep(3000, 500);
+  beep(4000, 600);
+
   delay(1000);
 }
 
@@ -81,9 +88,11 @@ float nav_degrees=SEEKER_NOTHING_FOUND;
 void loop() {
   delay(10);
 
+  /*Navigation state machine*/
   switch(state)
   {
-
+    
+    /*When nothing has been detected, stand still and look around*/
     case STATE_SEARCH:
     {
       if(seeker_did_full_revolution(SEEKER_READ_FLAG))
@@ -104,6 +113,7 @@ void loop() {
       break;
     }
 
+    /*The target is not infront of me. I will turn fast without moving*/
     case STATE_BIG_TURN:
     {
       if(seeker_did_full_revolution(SEEKER_READ_FLAG))
@@ -121,8 +131,8 @@ void loop() {
         /*Navigation angle hysteresis*/
         if(abs(nav_degrees)<NAVIGATION_SMALL_ANGLE)
         {
-          beep(4000, 50);
-          beep(6000, 50);
+          beep(4000, 100);
+          beep(3000, 100);
           state = STATE_MOVE_TOWARDS;
           break;
         }
@@ -140,6 +150,7 @@ void loop() {
       break;
     }
 
+    /*The target is infront of me. I will move towards target and turn slightly*/
     case STATE_MOVE_TOWARDS:
     {
       if(seeker_did_full_revolution(SEEKER_READ_FLAG))
@@ -173,6 +184,12 @@ void loop() {
         seeker_did_full_revolution(SEEKER_RESET_FLAG);
       }   
       break;   
+    }
+
+    /*Something is infront of me. Dont move*/
+    case STATE_BLOCKED:
+    {
+
     }
   }
 
