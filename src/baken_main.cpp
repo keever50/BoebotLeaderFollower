@@ -1,34 +1,35 @@
 #ifdef BAKEN
 #include <Arduino.h>
-#include <rf_receive2.h>
-#define BLAUW_pin 3
-#define GROEN_pin 4
-#define ROOD_pin 5
-#define Servo_pin 7
-#define IRpin 9
-void LED_uit();
+#include <rf_receive2.h>    //Include de library voor het ontvangen van de RF
+                            //Defenities verschillende pins:
+#define BLAUW_pin 3         //-Blauwe LED pin
+#define GROEN_pin 4         //-Groene LED pin
+#define ROOD_pin 5          //-Rode LED pin
+#define Servo_pin 7         //-Servo pin
+#define IRpin 9             //-Infrarood LED's pin
+void LED_uit();      //Defenities voor functies
 void LED_aan();
-char i;
-char aan = 0;
+char i;           //Variabele i aangemaakt
+char toggle_IR = 1;   //Vatiabele voor de toggle van de ir LED's aangemaakt en gedefineërd
 
 void setup()
 {
-  pinMode(BLAUW_pin, OUTPUT);
-  pinMode(GROEN_pin, OUTPUT);
-  pinMode(ROOD_pin, OUTPUT);
-  pinMode(Servo_pin, OUTPUT);
-  noInterrupts();
-  Serial.begin(9600);
+  Serial.begin(9600);     //begin serieële communicatie
+  pinMode(BLAUW_pin, OUTPUT);     //defineer blauwe pin als output
+  pinMode(GROEN_pin, OUTPUT);     //defineer groene pin als output
+  pinMode(ROOD_pin, OUTPUT);      //defineer rode pin als output
+  pinMode(Servo_pin, OUTPUT);     //defineer servo pin als output
+  pinMode(IRpin, OUTPUT);         //defineer IR pin als output
   rf_receive_init();
-  pinMode(IRpin, OUTPUT);
-  pinMode(13, OUTPUT);
+
+  noInterrupts();       //Disable interrupts
   TCCR1A = 0;     
   TCCR1B = 0;
   TIMSK1 = 0;    
   TCCR1B |= (1 << CS11) | (1<< WGM12);  
   OCR1A = (F_CPU/16)/38500;
-  interrupts();
-  LED_uit();
+  interrupts();       //Enable interrupts
+
 }
 
 ISR(TIMER1_COMPA_vect)
@@ -38,7 +39,6 @@ ISR(TIMER1_COMPA_vect)
     t=!t;
 }
 
-int toggle_IR=1;
 void loop()
 {
   if (toggle_IR==0)
@@ -52,7 +52,7 @@ void loop()
   }
   switch(rf_receive_char_data())
   {
-  case 60:
+  case 50:
   {
     if(toggle_IR)
     {
@@ -70,7 +70,6 @@ void loop()
   {
     break;
   }
-   break;
   }
   }
 
