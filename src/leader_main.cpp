@@ -32,10 +32,10 @@ digitalWrite(buzzer, LOW);
 pinMode(motorr, OUTPUT);
 pinMode(motorl, OUTPUT);
 
-pinMode(11, OUTPUT);
-pinMode(13, OUTPUT);
-digitalWrite(11, LOW);
-digitalWrite(13, LOW);
+//pinMode(11, OUTPUT);
+//pinMode(13, OUTPUT);
+//digitalWrite(11, LOW);
+//digitalWrite(13, LOW);
 
 noInterrupts();
 rf_receive_init();
@@ -58,7 +58,8 @@ void loop(void)
     static int speed = 0;
     static int command;
     command = rf_receive_char_data();
-
+    Serial.println(command);
+    delay(1000);
     switch (command)
     {
     case 0: // pass if no incoming command
@@ -123,6 +124,7 @@ void loop(void)
     
     case 53: // e:     Stop driving
         drive(0, 0);
+        speed = 0;
         break;
 
     default: // Signal for unknown command

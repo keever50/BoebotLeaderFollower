@@ -1,6 +1,4 @@
-/*
-    Made by Kevin Witteveen 
-*/
+/*Geschreven/Written by Kevin Witteveen*/
 
 #include <pwmgen1.h>
 #include <Arduino.h>

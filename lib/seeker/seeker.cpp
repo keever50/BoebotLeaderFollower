@@ -1,6 +1,9 @@
-#include <zoeker.h>
+/*Geschreven/Written by Kevin Witteveen*/
+
+#include <seeker.h>
 #include <Arduino.h>
 
+/*Configurates pins for basic manual functionality*/
 void seeker_init()
 {
     pinMode(SEEKER_STEP_PIN, OUTPUT);
@@ -11,6 +14,7 @@ void seeker_init()
     digitalWrite(SEEKER_EN_PIN, LOW);
 }
 
+/*Manual step and detect*/
 char seeker_stepdetect()
 {
     static int toggle;
@@ -24,11 +28,13 @@ char seeker_stepdetect()
     return digitalRead(SEEKER_DETECT_PIN);
 }
 
+/*Sets the direction of the seeker. This will not work properly in auto mode.*/
 void seeker_direction( char dir )
 {
     digitalWrite(SEEKER_DIR_PIN, dir);
 }
 
+/*Configurates and starts hardware timers and interrupts for automatic control. (seeker_init() must be called before)*/
 void seeker_init_auto()
 {
     /*Timer 2 set*/
@@ -52,6 +58,7 @@ void seeker_init_auto()
     OCR2A = 5;
 }
 
+/*Interrupt for automatic control*/
 volatile char seeker_did_full_revolution_flag=0;
 volatile char seeker_detect_buffer[SEEKER_STEPS_PER_REVOLUTION];
 volatile int seeker_current_step=0;
@@ -85,6 +92,7 @@ ISR(TIMER2_COMPA_vect)
     seeker_step_toggler=!seeker_step_toggler;
 }
 
+/*Returns a detection from auto mode. contains SEEKER_STEPS_PER_REVOLUTION detections*/
 char seeker_get_detections( int addr )
 {
     if(addr>=0 && addr<SEEKER_STEPS_PER_REVOLUTION)
@@ -95,6 +103,7 @@ char seeker_get_detections( int addr )
     }
 }
 
+/*Returns if seeker has made a full revolution in auto mode. This also means new scan data is ready. This flag stays up till reset.*/
 char seeker_did_full_revolution( char reset )
 {
     char flag = seeker_did_full_revolution_flag;
@@ -104,11 +113,13 @@ char seeker_did_full_revolution( char reset )
     return flag;
 }
 
+/*Get current automatic step*/
 int seeker_get_step()
 {
     return seeker_current_step;
 }
 
+/*Converts all detections into an average direction. This is not made for multiple IR sources at once as this will average them into one.*/
 float seeker_get_degrees()
 {
     float avg=0.0;
@@ -126,11 +137,17 @@ float seeker_get_degrees()
         count++;
       }
     }
+
+    if(count == 0)
+    {
+        return SEEKER_NOTHING_FOUND;
+    }
+
     avg=avg/count;
 
     /*Converting to degrees*/
     float ratio = avg/(SEEKER_STEPS_PER_REVOLUTION);
     float beacon_angle=ratio*360.0; 
 
-    return beacon_angle;
+    return 180-beacon_angle;
 }
