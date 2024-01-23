@@ -123,6 +123,7 @@ void loop(void)
     
     case 53: // e:     Stop driving
         drive(0, 0);
+        speed = 0;
         break;
 
     default: // Signal for unknown command
