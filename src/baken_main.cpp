@@ -7,6 +7,7 @@
 #define ROOD_pin 5
 #define Servo_pin 7
 #define IRpin 9
+#define Buzzerpin 12
 
 void Baken_uit();
 void Baken_aan();
@@ -21,6 +22,7 @@ void setup()
   pinMode(ROOD_pin, OUTPUT);
   pinMode(Servo_pin, OUTPUT);
   pinMode(IRpin, OUTPUT);
+  pinMode(Buzzerpin, OUTPUT);
   rf_receive_init();
 
   noInterrupts();       //Disable interrupts
@@ -90,7 +92,8 @@ void Baken_uit()
 
 void Baken_aan()
 {
-   digitalWrite(BLAUW_pin, LOW);
+    int j;
+    digitalWrite(BLAUW_pin, LOW);
     digitalWrite(GROEN_pin, LOW);
     digitalWrite(ROOD_pin, HIGH);
     delay(100);
@@ -100,6 +103,7 @@ void Baken_aan()
     delayMicroseconds(500);
     digitalWrite(Servo_pin, LOW);
     delay(10);
+    tone(Buzzerpin, 1000, 500);
 }
 
 #endif
