@@ -103,6 +103,13 @@ void rf_receive_init( )
     attachInterrupt(digitalPinToInterrupt(RF_RECEIVE_PIN), rf_receive_ISR, CHANGE);
 }
 
+void rf_break(int time)
+{
+    detachInterrupt(digitalPinToInterrupt(RF_RECEIVE_PIN));
+    delay(time);
+    attachInterrupt(digitalPinToInterrupt(RF_RECEIVE_PIN), rf_receive_ISR, CHANGE);
+}
+
 
 // Aanvulling van Xander
 int rf_receive_char_data(void)
