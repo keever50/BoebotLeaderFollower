@@ -1,51 +1,84 @@
 #ifdef BAKEN
 #include <Arduino.h>
-#include <rf_receive2.h>
+#include <rf_receive2.h>    //Include de library voor het ontvangen van de RF
+
+#define BLAUW_pin 3
+#define GROEN_pin 4
+#define ROOD_pin 5
+#define Servo_pin 7
 #define IRpin 9
+#define Buzzerpin 12
+
+void Baken_uit();
+void Baken_aan();
 char i;
-char flag = 60;
+char toggle_IR = 1;
 
 void setup()
 {
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
-
-  noInterrupts();
   Serial.begin(9600);
-  rf_receive_init();
+  pinMode(BLAUW_pin, OUTPUT);
+  pinMode(GROEN_pin, OUTPUT);
+  pinMode(ROOD_pin, OUTPUT);
+  pinMode(Servo_pin, OUTPUT);
   pinMode(IRpin, OUTPUT);
-  pinMode(13, OUTPUT);
+  pinMode(Buzzerpin, OUTPUT);
+  rf_receive_init();
+
+  noInterrupts();       //Disable interrupts
   TCCR1A = 0;     
-  TCCR1B = 0;     
-  TCCR1A |= (1 << COM1A0);
+  TCCR1B = 0;
+  TIMSK1 = 0;    
   TCCR1B |= (1 << CS11) | (1<< WGM12);  
-  TIMSK1 |= (1 << OCIE1A);
-  OCR1A = (F_CPU/16)/38500;
-  interrupts();
+  OCR1A = (F_CPU/16)/38500;     //Berekening om de IR-LED's op de juiste frequentie te pulsen
+  interrupts();       //Enable interrupts
+
 }
 
 ISR(TIMER1_COMPA_vect)
 {
-    static int t;
-    digitalWrite(13, t);
+    static int t;        //In deze functie wordt de IR
+    digitalWrite(IRpin, t);
     t=!t;
 }
 
 void loop()
 {
-  if(flag==60)
+  if (toggle_IR==0)
   {
-    i=5;
-    digitalWrite(i, HIGH);
-    delay(100);
-    digitalWrite(i, LOW);
-    delay(100);
+    Baken_aan();
   }
 
-  else
+  if (toggle_IR==1)
   {
-    for(i=3; i<=4; i++)
+    Baken_uit();
+  }
+  switch(rf_receive_char_data())
+  {
+  case 50:
+  {
+    if(toggle_IR)
+    {
+      TIMSK1 |= (1 << OCIE1A);
+      toggle_IR=0;
+    }
+    else{
+      TIMSK1 = 0;
+      toggle_IR=1;
+    }
+
+    break;
+  }
+  default:
+  {
+    break;
+  }
+  }
+  }
+
+void Baken_uit()
+{
+  for(i=3; i<=4; i++)
     {
       digitalWrite(i, HIGH);
       delay(200);
@@ -55,8 +88,22 @@ void loop()
       digitalWrite(i, HIGH);
       delay(200);
     }
-  }
-   
+}
+
+void Baken_aan()
+{
+    int j;
+    digitalWrite(BLAUW_pin, LOW);
+    digitalWrite(GROEN_pin, LOW);
+    digitalWrite(ROOD_pin, HIGH);
+    delay(100);
+    digitalWrite(ROOD_pin, LOW);
+    delay(100);
+    digitalWrite(Servo_pin, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(Servo_pin, LOW);
+    delay(10);
+    tone(Buzzerpin, 1000, 500);
 }
 
 #endif
