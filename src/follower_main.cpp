@@ -12,12 +12,12 @@
 #define WHEELS_MAX_VARIATION  0.05
 
 /*Navigation angle hysteresis*/
-#define NAVIGATION_BIG_ANGLE  25 /*Above this angle, do a big turn*/
+#define NAVIGATION_BIG_ANGLE  30 /*Above this angle, do a big turn*/
 #define NAVIGATION_SMALL_ANGLE 10 /*Below this angle, do a normal turn and move*/
 
 #define NAVIGATION_BIG_ANGLE_STEERING_SPEED 0.03f
-#define NAVIGATION_STEERING_MULTIPLIER 0.001f
-#define NAVIGATION_FORWARD_SPEED  0.04f
+#define NAVIGATION_STEERING_MULTIPLIER 0.0005f
+#define NAVIGATION_FORWARD_SPEED  0.05f
 #define NAVIGATION_FRONT_CLEARANCE  30
 
 /*State machine state cases*/
@@ -134,8 +134,9 @@ void loop() {
         }
 
         /*Navigation angle hysteresis*/
-        if(abs(nav_degrees)<NAVIGATION_SMALL_ANGLE)
+        if(fabs(nav_degrees)<NAVIGATION_SMALL_ANGLE)
         {
+          wheels(0,0);
           beep(4000, 100);
           beep(3000, 100);
           state = STATE_MOVE_TOWARDS;
@@ -177,24 +178,28 @@ void loop() {
         }
 
         /*Navigation angle hysteresis*/
-        if(abs(nav_degrees)>NAVIGATION_BIG_ANGLE)
+        if(fabs(nav_degrees)>NAVIGATION_BIG_ANGLE)
         {
+          wheels(0,0);
           beep(1000, 200);
           state = STATE_BIG_TURN;
           break;
         }
 
         /*Steering*/
-        float steer = abs(nav_degrees)*NAVIGATION_STEERING_MULTIPLIER;
+        float steer = fabs(nav_degrees)*NAVIGATION_STEERING_MULTIPLIER;
         if(nav_degrees>0)
         {
-          wheels(steer+NAVIGATION_FORWARD_SPEED,NAVIGATION_FORWARD_SPEED);
+          wheels(NAVIGATION_FORWARD_SPEED,NAVIGATION_FORWARD_SPEED-steer);
         }else{
-          wheels(NAVIGATION_FORWARD_SPEED,steer+NAVIGATION_FORWARD_SPEED);
+          wheels(NAVIGATION_FORWARD_SPEED-steer,NAVIGATION_FORWARD_SPEED);
         }        
 
         seeker_did_full_revolution(SEEKER_RESET_FLAG);
+
+        break;
       }   
+      //wheels(0,0);
       break;   
     }
 
