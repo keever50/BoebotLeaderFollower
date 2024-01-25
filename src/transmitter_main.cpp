@@ -12,7 +12,9 @@ void setup()
     Serial.begin(9600);
     Serial.println("Welkom in de control hub van het Follow the leader project.");
     delay(1000);
-    Serial.println("U kan commandos geven door de code van de gewenste actie in de seriële input te geven.");
+    Serial.print("U kan commandos geven door de code ");
+    delay(100);
+    Serial.println("van de gewenste actie in de seriële input te geven.");
     delay(1000);
     Serial.println("Geef a.u.b. uw eerste input:");
 }
@@ -32,18 +34,19 @@ void loop()
         
         if ((toInt(input_buffer) < 0) || (toInt(input_buffer) > 256))
         {
-            Serial.println("Ongeoorloofde input, geef a.u.b. een geldige input");
+            Serial.println("Ongeoorloofde input");
         }
         else
         {
             char bitarray[8] = {0, 0, 0, 0, 0, 0, 0, 0};
             fill_binary_array(bitarray, toInt(input_buffer));
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < 5; i++)
             {
                 transmit_binary(bitarray, 8);
-            }
-            Serial.println("Geef a.u.b. de volgende input:");
+            }  
         }
+    delay(500);
+    Serial.println("Geef a.u.b. de volgende input:");
     }
 }
 

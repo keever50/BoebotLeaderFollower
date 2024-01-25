@@ -4,8 +4,11 @@
 #include <Arduino.h>
 #include <rf_receive2.h>
 
+#define drive_threshold 70
+
 #define IR_leds 9
-#define buzzer 4
+#define buzzer 5
+#define errorLed 3
 
 #define speedr 10
 #define motorr 12
@@ -28,6 +31,8 @@ digitalWrite(IR_leds, LOW);
 
 pinMode(buzzer, OUTPUT);
 digitalWrite(buzzer, LOW);
+pinMode(errorLed, OUTPUT);
+digitalWrite(errorLed, LOW);
 
 pinMode(motorr, OUTPUT);
 pinMode(motorl, OUTPUT);
@@ -58,12 +63,15 @@ void loop(void)
     static int speed = 0;
     static int command;
     command = rf_receive_char_data();
-    Serial.println(command);
-    delay(1000);
+
     switch (command)
     {
     case 0: // pass if no incoming command
         break;
+
+    case 50: // pass if command for baken
+        break;
+
     case 60: // l:   toggle leds
     {
         static char toggle_led = 1;
@@ -87,19 +95,19 @@ void loop(void)
         break;
         
     case 71: // w:    Accelerate
-        if (speed >= 70)
+        if (speed >= drive_threshold)
         {
             speed += 10;
         }
         else
         {
-            speed = 70;
+            speed = drive_threshold;
         }
         drive(speed, speed);
         break;
 
     case 67: // s:     Decelerate
-        if (speed > 70)
+        if (speed > drive_threshold)
         {
             speed -= 10;
         }
@@ -111,14 +119,14 @@ void loop(void)
         break;
     
     case 49: // a:      Turn left
-        drive(70, 100);
-        delay(1500);
+        drive(0, 100);
+        rf_break(400);
         drive(speed, speed);
         break;
     
     case 52: // d:     Turn right
-        drive(100, 70);
-        delay(1500);
+        drive(100, 0);
+        rf_break(400);
         drive(speed, speed);
         break;
     
@@ -129,8 +137,10 @@ void loop(void)
 
     default: // Signal for unknown command
         digitalWrite(buzzer, HIGH);
-        delay(200);
+        digitalWrite(errorLed, HIGH);
+        rf_break(300);
         digitalWrite(buzzer, LOW);
+        digitalWrite(errorLed, LOW);
         break;
     }
 }
