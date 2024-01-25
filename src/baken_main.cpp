@@ -28,28 +28,28 @@ void setup()
   noInterrupts();       //Disable interrupts
   TCCR1A = 0;     
   TCCR1B = 0;
-  TIMSK1 = 0;    
+  TIMSK1 = 0;         //Timer is 0 baken staat uit in de beginfase
   TCCR1B |= (1 << CS11) | (1<< WGM12);  
-  OCR1A = (F_CPU/16)/38500;     //Berekening om de IR-LED's op de juiste frequentie te pulsen
+  OCR1A = (F_CPU/16)/38500;     //Berekening om de IR-LED's op de juiste frequentie te pulsen (38,5 kHz)
   interrupts();       //Enable interrupts
 
 }
 
-ISR(TIMER1_COMPA_vect)
+ISR(TIMER1_COMPA_vect)     
 {
-    static int t;        //In deze functie wordt de IR
+    static int t;        //In deze functie worden de IR lampjes gepulst op een frequentie van 38,5 kHz
     digitalWrite(IRpin, t);
     t=!t;
 }
 
 void loop()
 {
-  if (toggle_IR==0)
+  if (toggle_IR==0)   //Als de IR_toggle gelijk is aan 0, staat de baken aan
   {
     Baken_aan();
   }
 
-  if (toggle_IR==1)
+  if (toggle_IR==1)     //Als de toggle gelijk is aan 1, staat de baken uit
   {
     Baken_uit();
   }
@@ -76,7 +76,7 @@ void loop()
   }
   }
 
-void Baken_uit()
+void Baken_uit()        //Functie als de baken geen RF singaal ontvangt
 {
   for(i=3; i<=4; i++)
     {
@@ -90,7 +90,7 @@ void Baken_uit()
     }
 }
 
-void Baken_aan()
+void Baken_aan()      //Functie als de baken een RF signaal ontvangt
 {
     int j;
     digitalWrite(BLAUW_pin, LOW);
